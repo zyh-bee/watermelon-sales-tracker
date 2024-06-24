@@ -70,7 +70,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const salesForm = document.getElementById('sales-form');
-        const salesTable = document.getElementById('sales-table');
+        const salesTable = document.getElementById('sales-table').getElementsByTagName('tbody')[0];
         const totalBoardsElement = document.getElementById('total-boards');
         const totalPriceElement = document.getElementById('total-price');
         let totalBoards = 0;
@@ -113,7 +113,7 @@
             totalPriceElement.textContent = totalPrice.toFixed(2);
         }
 
-        // Function to add a new sales record
+        // Function to add a new sales record to the table
         function addRecordToTable(boardCount, price, date) {
             const newRow = salesTable.insertRow(-1);
             newRow.innerHTML = `
@@ -126,13 +126,10 @@
             // Add delete functionality
             const deleteButton = newRow.querySelector('.delete-button');
             deleteButton.addEventListener('click', function() {
-                salesTable.deleteRow(newRow.rowIndex);
+                salesTable.deleteRow(newRow.rowIndex - 1);
                 updateTotals();
                 saveRecords();
             });
-
-            updateTotals();
-            saveRecords();
         }
 
         // Handle form submission
@@ -144,6 +141,8 @@
             const date = new Date().toLocaleString();
 
             addRecordToTable(boardCount, price, date);
+            updateTotals();
+            saveRecords();
 
             // Reset form
             salesForm.reset();
