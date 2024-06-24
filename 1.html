@@ -79,16 +79,24 @@
         let totalBoards = 0;
         let totalPrice = 0;
 
-        // Load saved records from localStorage
-        function loadRecords() {
-            const records = JSON.parse(localStorage.getItem('salesRecords')) || [];
-            records.forEach(record => {
-                addRecordToTable(record.boardCount, record.price, record.date);
-            });
-            updateTotals();
+        // Gist URL and ID
+        const gistUrl = 'https://gist.githubusercontent.com/username/gist-id/raw/data.json';
+
+        // Function to fetch records from Gist
+        function fetchRecords() {
+            fetch(gistUrl)
+                .then(response => response.json())
+                .then(data => {
+                    const records = data.salesRecords || [];
+                    records.forEach(record => {
+                        addRecordToTable(record.boardCount, record.price, record.date);
+                    });
+                    updateTotals();
+                })
+                .catch(error => console.error('Error fetching records:', error));
         }
 
-        // Save records to localStorage
+        // Function to save records to Gist
         function saveRecords() {
             const records = [];
             document.querySelectorAll('#sales-table tbody tr').forEach(row => {
@@ -97,8 +105,17 @@
                 const date = row.cells[2].textContent;
                 records.push({ boardCount, price, date });
             });
-            localStorage.setItem('salesRecords', JSON.stringify(records));
-            console.log('Records saved to localStorage:', records);
+
+            fetch(gistUrl, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ salesRecords: records })
+            })
+            .then(response => response.json())
+            .then(data => console.log('Records saved to Gist:', data))
+            .catch(error => console.error('Error saving records:', error));
         }
 
         // Function to calculate and update totals
@@ -154,7 +171,7 @@
         });
 
         // Load saved records on page load
-        loadRecords();
+        fetchRecords();
     });
 </script>
 
