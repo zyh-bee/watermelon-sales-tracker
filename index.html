@@ -12,7 +12,7 @@
     table {
         width: 100%;
         border-collapse: collapse;
-        margin-bottom: 20px;
+        margin-bottom: 40px;
     }
     table, th, td {
         border: 1px solid #ddd;
@@ -95,6 +95,7 @@
                 records.push({ boardCount, price, date });
             });
             localStorage.setItem('salesRecords', JSON.stringify(records));
+            console.log('Records saved to localStorage:', records);
         }
 
         // Function to calculate and update totals
@@ -130,6 +131,9 @@
                 updateTotals();
                 saveRecords();
             });
+
+            updateTotals();
+            saveRecords();
         }
 
         // Handle form submission
@@ -141,8 +145,6 @@
             const date = new Date().toLocaleString();
 
             addRecordToTable(boardCount, price, date);
-            updateTotals();
-            saveRecords();
 
             // Reset form
             salesForm.reset();
