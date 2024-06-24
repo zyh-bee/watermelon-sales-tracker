@@ -76,6 +76,27 @@
         let totalBoards = 0;
         let totalPrice = 0;
 
+        // Load saved records from localStorage
+        function loadRecords() {
+            const records = JSON.parse(localStorage.getItem('salesRecords')) || [];
+            records.forEach(record => {
+                addRecordToTable(record.boardCount, record.price, record.date);
+            });
+            updateTotals();
+        }
+
+        // Save records to localStorage
+        function saveRecords() {
+            const records = [];
+            document.querySelectorAll('#sales-table tbody tr').forEach(row => {
+                const boardCount = parseInt(row.cells[0].textContent);
+                const price = parseFloat(row.cells[1].textContent);
+                const date = row.cells[2].textContent;
+                records.push({ boardCount, price, date });
+            });
+            localStorage.setItem('salesRecords', JSON.stringify(records));
+        }
+
         // Function to calculate and update totals
         function updateTotals() {
             totalBoards = 0;
@@ -93,14 +114,7 @@
         }
 
         // Function to add a new sales record
-        salesForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const boardCount = parseInt(document.getElementById('board-count').value);
-            const price = parseFloat(document.getElementById('price').value).toFixed(2);
-            const date = new Date().toLocaleString();
-
-            // Create new row
+        function addRecordToTable(boardCount, price, date) {
             const newRow = salesTable.insertRow(-1);
             newRow.innerHTML = `
                 <td>${boardCount}</td>
@@ -114,17 +128,29 @@
             deleteButton.addEventListener('click', function() {
                 salesTable.deleteRow(newRow.rowIndex);
                 updateTotals();
+                saveRecords();
             });
 
-            // Update totals
-            totalBoards += boardCount;
-            totalPrice += parseFloat(price);
-            totalBoardsElement.textContent = totalBoards;
-            totalPriceElement.textContent = totalPrice.toFixed(2);
+            updateTotals();
+            saveRecords();
+        }
+
+        // Handle form submission
+        salesForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const boardCount = parseInt(document.getElementById('board-count').value);
+            const price = parseFloat(document.getElementById('price').value).toFixed(2);
+            const date = new Date().toLocaleString();
+
+            addRecordToTable(boardCount, price, date);
 
             // Reset form
             salesForm.reset();
         });
+
+        // Load saved records on page load
+        loadRecords();
     });
 </script>
 
